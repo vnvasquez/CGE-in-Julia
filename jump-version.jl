@@ -2,6 +2,12 @@ using JuMP
 
 # Parameters
 
+# from david
+#sector = [:sec1, :sec2]
+#@variable m begin
+#  x[sector]
+#end
+
 ## Production block
 
 KZ = [60.,50.] # inital capital demand
