@@ -26,12 +26,12 @@ aF = XDZ ./ (gammaF.*KZ.^((sigmaF-1)/sigmaF)+(1-gammaF).*LZ^((1-sigmaF)./sigmaF)
 
 ## Consumption block
 
-CZ = [55.,165.]    # household demand for commodities
-UZ			           # utility level of household
-YZ			           # household's total income
-frisch			       # Frisch parameter
-elasY = [0.9,1.1]  #income elasticities of demand for commodities
+CZ = [55.,165.]                          # household demand for commodities
+UZ = prod(CZ. - muH.).^alphaHLES	       # utility level of household
+YZ = PKZ.*KSZ. + PLZ.*LSZ.			         # household's total income
+frisch = -1.1			                       # Frisch parameter
+elasY = [0.9,1.1]                        #income elasticities of demand for commodities
 
-io(sec, secc)	# Technical coefficients
-muH(sec)		# Subsistence level
-alphaHLES(sec)	# marginal budget shares of utility function
+io = IOZ./XDZ.                                          # Technical coefficients
+alphaHLES = elasY.*(PDZ.*CZ.)./YZ	                      # marginal budget shares of utility function
+muH = CZ. + (alphaHLES.*YZ)/(PDZ.*frisch) 	            # Subsistence level
