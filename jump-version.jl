@@ -35,3 +35,28 @@ elasY = [0.9,1.1]                        #income elasticities of demand for comm
 io = IOZ./XDZ.                                          # Technical coefficients
 alphaHLES = elasY.*(PDZ.*CZ.)./YZ	                      # marginal budget shares of utility function
 muH = CZ. + (alphaHLES.*YZ)/(PDZ.*frisch) 	            # Subsistence level
+
+
+## Equations
+
+# HOUSEHOLDS
+EQC = muH + alphaHLES/(PD * (Y - sum(PD * muH))    	#consumer consumption
+EQY	= PK*KS + PL*LS		                              #income balance
+EQU	= prod((C - muH)^alphaHLES)	                    #household utility
+
+# FIRMS
+EQK	= gammaF^sigmaF * PK^(-sigmaF) * (gammaF^sigmaF * PK^(1-sigmaF) +
+      (1-gammaF)^sigmaF * PL^(1-sigmaF))^(sigmaF/(1-sigmaF)) * (XD/aF)      #firm demand for capital
+
+EQL = (1-gammaF)^sigmaF * PL^(-sigmaF) * (gammaF^sigmaF * PK^(1-sigmaF) +
+      (1-gammaF)^sigmaF * PL^(1-sigmaF)^(sigmaF/(1-sigmaF)) * (XD/aF)       #firm demand for labor
+
+EQZPC = PK*K + PL*L + sum(io*PD)*XD                                         #zero-profit condition
+
+# MARKET CLEARING
+EQXD    #market clearing consumption
+EQKS		#capital market clearing
+EQLS		#labor market clearing
+
+# OBJECTIVE
+EQT			#objective function
