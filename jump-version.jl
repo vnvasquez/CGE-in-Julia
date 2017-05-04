@@ -49,7 +49,7 @@ muH = CZ. + (alphaHLES.*YZ)/(PDZ.*frisch) 	            # Subsistence level
   EQU	= prod((C - muH)^alphaHLES)	                    #household utility
 
   # MARKET CLEARING
-  EQXD    #market clearing consumption
+  EQXD = sum(io * XD) + C	                            #market clearing consumption
 end
 
 #production
@@ -64,10 +64,10 @@ end
   EQZPC = PK*K + PL*L + sum(io*PD)*XD                                         #zero-profit condition
 
   # MARKET CLEARING
-  EQKS		#capital market clearing
-  EQLS		#labor market clearing
+  EQKS = KS           #capital market clearing  == sum(K)
+  EQLS = LS           #labor market clearing == sum(L)
 end
 
 
-# OBJECTIVE - INCLUDE IN "SOLVE" SECTION 
+# OBJECTIVE - INCLUDE THIS IN "SOLVE" CONSTRAINT BLOCK
 EQT			#objective function
