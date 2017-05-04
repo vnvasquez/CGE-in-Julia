@@ -2,13 +2,9 @@ using JuMP
 
 # to do: add index; read in data
 
-### PARAMETERS ###
+M = model(IpoptSolver())
 
-# from david
-#sector = [:sec1, :sec2]
-#@variable m begin
-#  x[sector]
-# end
+### PARAMETERS ###
 
 ## Production block
 
