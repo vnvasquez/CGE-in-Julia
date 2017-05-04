@@ -41,6 +41,28 @@ muH = CZ + (alphaHLES.*YZ)/(PDZ.*frisch) 	            # Subsistence level
 UZ = prod(CZ. - muH.).^alphaHLES	       # utility level of household
 
 
+# Variables
+
+## Production
+@variables M begin
+  K, start = KZ
+  PK, start = PKZ
+  L, start = LZ
+  PL, start = PLZ
+  PD, start = PDZ
+  KS, start = KSZ
+  LS, start = LSZ
+  XD, start = XDZ
+end
+
+## Consumption
+@variables M begin
+  C, start = CZ
+  Y, start = YZ
+  U, start = UZ
+end
+
+
 ## Equations
 
 # HOUSEHOLDS
