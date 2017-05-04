@@ -2,16 +2,9 @@ using JuMP
 
 M = model(IpoptSolver())
 
-# Parameters
+### PARAMETERS ###
 
-# from david
-#sector = [:sec1, :sec2]
-#@variable m begin
-#  x[sector]
-#end
-
-## Production block
-
+## Production block (firm = producer, and user of labor)
 KZ = [60.,50.] # inital capital demand
 KSZ = sum(KZ) # capital endowment
 LZ = [20.,90.] # initial labor demand
@@ -26,8 +19,7 @@ gammaF = 1/(1+(1+((PLZ/PKZ)*((KZ./LZ)^(-1/sigmaF))))) # distribution parameter o
 aF = XDZ ./ (gammaF.*KZ.^((sigmaF-1)/sigmaF)+(1-gammaF).*LZ^((1-sigmaF)./sigmaF))^(sigmaF/(sigmaF-1)) # efficiency parameter in production function
 
 
-## Consumption block (household = consumer and provider of labor, firm = producer, and user of labor)
-
+## Consumption block (household = consumer and provider of labor)
 CZ = [55.,165.]                          # household demand for commodities
 UZ = prod(CZ. - muH.).^alphaHLES	       # utility level of household
 YZ = PKZ.*KSZ. + PLZ.*LSZ.			         # household's total income
@@ -39,35 +31,37 @@ alphaHLES = elasY.*(PDZ.*CZ.)./YZ	                      # marginal budget shares
 muH = CZ. + (alphaHLES.*YZ)/(PDZ.*frisch) 	            # Subsistence level
 
 
-## Equations (constraints)
+### EQUATIONS (constraints) ###
 
-# consumption
+## Consumption
 @constraints M begin
   # HOUSEHOLDS
-  EQC = muH + alphaHLES/(PD * (Y - sum(PD * muH))    	#consumer consumption
-  EQY	= PK*KS + PL*LS	                                #income balance
-  EQU	= prod((C - muH)^alphaHLES)	                    #household utility
+  EQC, C == muH + alphaHLES/(PD * (Y - sum(PD * muH))    	 #consumer consumption
+  EQY, Y == PK*KS + PL*LS	                                 #income balance
+  EQU, U == prod((C - muH)^alphaHLES)	                     #household utility
 
   # MARKET CLEARING
-  EQXD = sum(io * XD) + C	                            #market clearing consumption
+  EQXD, XD == sum(io * XD) + C	                           #market clearing consumption
+
 end
 
-#production
+## Production
 @constraints M begin
   # FIRMS
-  EQK	= gammaF^sigmaF * PK^(-sigmaF) * (gammaF^sigmaF * PK^(1-sigmaF) +
-        (1-gammaF)^sigmaF * PL^(1-sigmaF))^(sigmaF/(1-sigmaF)) * (XD/aF)      #firm demand for capital
+  EQK, K	== gammaF^sigmaF * PK^(-sigmaF) * (gammaF^sigmaF * PK^(1-sigmaF) +
+        (1-gammaF)^sigmaF * PL^(1-sigmaF))^(sigmaF/(1-sigmaF)) * (XD/aF)                #firm demand for capital
 
-  EQL = (1-gammaF)^sigmaF * PL^(-sigmaF) * (gammaF^sigmaF * PK^(1-sigmaF) +
-        (1-gammaF)^sigmaF * PL^(1-sigmaF)^(sigmaF/(1-sigmaF)) * (XD/aF)       #firm demand for labor
+  EQL, L == (1-gammaF)^sigmaF * PL^(-sigmaF) * (gammaF^sigmaF * PK^(1-sigmaF) +
+        (1-gammaF)^sigmaF * PL^(1-sigmaF)^(sigmaF/(1-sigmaF)) * (XD/aF)                 #firm demand for labor
 
-  EQZPC = PK*K + PL*L + sum(io*PD)*XD                                         #zero-profit condition
+  EQZPC, PD * XD == PK*K + PL*L + sum(io*PD)*XD                                         #zero-profit condition
 
   # MARKET CLEARING
   EQKS, sum(K) == KS           #capital market clearing  == sum(K)
-  EQLS = LS           #labor market clearing == sum(L)
+  EQLS, sum(L) == LS           #labor market clearing == sum(L)
 end
 
+### SOLVER ###
 
-# OBJECTIVE - INCLUDE THIS IN "SOLVE" CONSTRAINT BLOCK
-EQT			#objective function
+#TRICK == 0  #objective function -> unnecessary because using solver
+solve(M)
