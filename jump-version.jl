@@ -2,6 +2,7 @@ using JuMP
 
 M = model(IpoptSolver())
 
+
 ### PARAMETERS ###
 
 ## Production block (firm = producer, and user of labor)
