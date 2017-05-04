@@ -26,7 +26,7 @@ gammaF = 1/(1+(1+((PLZ/PKZ)*((KZ./LZ)^(-1/sigmaF))))) # distribution parameter o
 aF = XDZ ./ (gammaF.*KZ.^((sigmaF-1)/sigmaF)+(1-gammaF).*LZ^((1-sigmaF)./sigmaF))^(sigmaF/(sigmaF-1)) # efficiency parameter in production function
 
 
-## Consumption block
+## Consumption block (household = consumer and provider of labor, firm = producer, and user of labor)
 
 CZ = [55.,165.]                          # household demand for commodities
 UZ = prod(CZ. - muH.).^alphaHLES	       # utility level of household
@@ -39,26 +39,35 @@ alphaHLES = elasY.*(PDZ.*CZ.)./YZ	                      # marginal budget shares
 muH = CZ. + (alphaHLES.*YZ)/(PDZ.*frisch) 	            # Subsistence level
 
 
-## Equations
+## Equations (constraints)
 
-# HOUSEHOLDS
-EQC = muH + alphaHLES/(PD * (Y - sum(PD * muH))    	#consumer consumption
-EQY	= PK*KS + PL*LS		                              #income balance
-EQU	= prod((C - muH)^alphaHLES)	                    #household utility
+# consumption
+@constraints M begin
+  # HOUSEHOLDS
+  EQC = muH + alphaHLES/(PD * (Y - sum(PD * muH))    	#consumer consumption
+  EQY	= PK*KS + PL*LS	                                #income balance
+  EQU	= prod((C - muH)^alphaHLES)	                    #household utility
 
-# FIRMS
-EQK	= gammaF^sigmaF * PK^(-sigmaF) * (gammaF^sigmaF * PK^(1-sigmaF) +
-      (1-gammaF)^sigmaF * PL^(1-sigmaF))^(sigmaF/(1-sigmaF)) * (XD/aF)      #firm demand for capital
+  # MARKET CLEARING
+  EQXD    #market clearing consumption
+end
 
-EQL = (1-gammaF)^sigmaF * PL^(-sigmaF) * (gammaF^sigmaF * PK^(1-sigmaF) +
-      (1-gammaF)^sigmaF * PL^(1-sigmaF)^(sigmaF/(1-sigmaF)) * (XD/aF)       #firm demand for labor
+#production
+@constraints M begin
+  # FIRMS
+  EQK	= gammaF^sigmaF * PK^(-sigmaF) * (gammaF^sigmaF * PK^(1-sigmaF) +
+        (1-gammaF)^sigmaF * PL^(1-sigmaF))^(sigmaF/(1-sigmaF)) * (XD/aF)      #firm demand for capital
 
-EQZPC = PK*K + PL*L + sum(io*PD)*XD                                         #zero-profit condition
+  EQL = (1-gammaF)^sigmaF * PL^(-sigmaF) * (gammaF^sigmaF * PK^(1-sigmaF) +
+        (1-gammaF)^sigmaF * PL^(1-sigmaF)^(sigmaF/(1-sigmaF)) * (XD/aF)       #firm demand for labor
 
-# MARKET CLEARING
-EQXD    #market clearing consumption
-EQKS		#capital market clearing
-EQLS		#labor market clearing
+  EQZPC = PK*K + PL*L + sum(io*PD)*XD                                         #zero-profit condition
 
-# OBJECTIVE
+  # MARKET CLEARING
+  EQKS		#capital market clearing
+  EQLS		#labor market clearing
+end
+
+
+# OBJECTIVE - INCLUDE IN "SOLVE" SECTION 
 EQT			#objective function
