@@ -2,7 +2,7 @@ using JuMP
 
 # to do: add index; read in data
 
-# Parameters
+### PARAMETERS ###
 
 # from david
 #sector = [:sec1, :sec2]
@@ -30,8 +30,7 @@ aF = XDZ ./ (gammaF.*KZ.^((sigmaF-1)/sigmaF)+(1-gammaF).*LZ^((1-sigmaF)./sigmaF)
                             # efficiency parameter in production function
 
 
-## Consumption block
-
+## Consumption block (household = consumer and provider of labor)
 CZ = [55.,165.]                          # household demand for commodities
 YZ = PKZ*KSZ + PLZ*LSZ			             # household's total income
 frisch = -1.1			                       # Frisch parameter
@@ -63,26 +62,37 @@ end
 end
 
 
-## Equations
+### EQUATIONS (constraints) ###
 
-# HOUSEHOLDS
-EQC = muH + alphaHLES/(PD * (Y - sum(PD * muH))    	#consumer consumption
-EQY	= PK*KS + PL*LS		                              #income balance
-EQU	= prod((C - muH)^alphaHLES)	                    #household utility
+## Consumption
+@constraints M begin
+  # HOUSEHOLDS
+  EQC, C == muH + alphaHLES/(PD * (Y - sum(PD * muH))    	 #consumer consumption
+  EQY, Y == PK*KS + PL*LS	                                 #income balance
+  EQU, U == prod((C - muH)^alphaHLES)	                     #household utility
 
-# FIRMS
-EQK	= gammaF^sigmaF * PK^(-sigmaF) * (gammaF^sigmaF * PK^(1-sigmaF) +
-      (1-gammaF)^sigmaF * PL^(1-sigmaF))^(sigmaF/(1-sigmaF)) * (XD/aF)      #firm demand for capital
+  # MARKET CLEARING
+  EQXD, XD == sum(io * XD) + C	                           #market clearing consumption
 
-EQL = (1-gammaF)^sigmaF * PL^(-sigmaF) * (gammaF^sigmaF * PK^(1-sigmaF) +
-      (1-gammaF)^sigmaF * PL^(1-sigmaF)^(sigmaF/(1-sigmaF)) * (XD/aF)       #firm demand for labor
+end
 
-EQZPC = PK*K + PL*L + sum(io*PD)*XD                                         #zero-profit condition
+## Production
+@constraints M begin
+  # FIRMS
+  EQK, K	== gammaF^sigmaF * PK^(-sigmaF) * (gammaF^sigmaF * PK^(1-sigmaF) +
+        (1-gammaF)^sigmaF * PL^(1-sigmaF))^(sigmaF/(1-sigmaF)) * (XD/aF)                #firm demand for capital
 
-# MARKET CLEARING
-EQXD    #market clearing consumption
-EQKS		#capital market clearing
-EQLS		#labor market clearing
+  EQL, L == (1-gammaF)^sigmaF * PL^(-sigmaF) * (gammaF^sigmaF * PK^(1-sigmaF) +
+        (1-gammaF)^sigmaF * PL^(1-sigmaF)^(sigmaF/(1-sigmaF)) * (XD/aF)                 #firm demand for labor
 
-# OBJECTIVE
-EQT			#objective function
+  EQZPC, PD * XD == PK*K + PL*L + sum(io*PD)*XD                                         #zero-profit condition
+
+  # MARKET CLEARING
+  EQKS, sum(K) == KS           #capital market clearing  == sum(K)
+  EQLS, sum(L) == LS           #labor market clearing == sum(L)
+end
+
+### SOLVER ###
+
+#TRICK == 0  #objective function -> unnecessary because using solver
+solve(M)
