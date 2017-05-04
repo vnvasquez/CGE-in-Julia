@@ -64,7 +64,7 @@ end
   EQZPC = PK*K + PL*L + sum(io*PD)*XD                                         #zero-profit condition
 
   # MARKET CLEARING
-  EQKS = KS           #capital market clearing  == sum(K)
+  EQKS, sum(K) == KS           #capital market clearing  == sum(K)
   EQLS = LS           #labor market clearing == sum(L)
 end
 
