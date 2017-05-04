@@ -1,5 +1,7 @@
 using JuMP
 
+M = model(IpoptSolver())
+
 # Parameters
 
 # from david
