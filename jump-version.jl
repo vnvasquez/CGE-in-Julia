@@ -1,5 +1,7 @@
 using JuMP
 
+# to do: add index; read in data
+
 # Parameters
 
 # from david
@@ -17,7 +19,8 @@ LSZ = sum(LZ)               # labor endowment
 PKZ = 1.                    # initial capital price
 PLZ = 1.                    # initial labor price (wages)
 PDZ = [1.,1.]               # inital commodity price (price of domestically-produced commodities)
-IOZ = [5. 40. ; 15. 20.]    # technical coefficients for intermediate inputs
+IOZ = [5. 40. ; 15. 20.]    # intermediate inputs
+io = IOZ/XDZ               # Technical coefficients
 XDZ = (PKZ.*KZ)./PDZ + (PLZ.*LZ)./PDZ + (IOZ[1:2]*PDZ + IOZ[3:4]*PDZ)./PDZ
                             # initial commodity production level
 sigmaF = [0.8, 1.2]         # elasticity of substition between factors in production function
@@ -30,14 +33,12 @@ aF = XDZ ./ (gammaF.*KZ.^((sigmaF-1)/sigmaF)+(1-gammaF).*LZ^((1-sigmaF)./sigmaF)
 ## Consumption block
 
 CZ = [55.,165.]                          # household demand for commodities
-UZ = prod(CZ. - muH.).^alphaHLES	       # utility level of household
-YZ = PKZ.*KSZ. + PLZ.*LSZ.			         # household's total income
+YZ = PKZ*KSZ + PLZ*LSZ			             # household's total income
 frisch = -1.1			                       # Frisch parameter
-elasY = [0.9,1.1]                        #income elasticities of demand for commodities
-
-io = IOZ./XDZ.                                          # Technical coefficients
-alphaHLES = elasY.*(PDZ.*CZ.)./YZ	                      # marginal budget shares of utility function
-muH = CZ. + (alphaHLES.*YZ)/(PDZ.*frisch) 	            # Subsistence level
+elasY = [0.9,1.1]                        # income elasticities of demand for commodities
+alphaHLES = (elasY.*(PDZ.*CZ.))/YZ	       # marginal budget shares of utility function
+muH = CZ + (alphaHLES.*YZ)/(PDZ.*frisch) 	            # Subsistence level
+UZ = prod(CZ. - muH.).^alphaHLES	       # utility level of household
 
 
 ## Equations
