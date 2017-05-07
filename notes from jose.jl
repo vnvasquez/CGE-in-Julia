@@ -12,7 +12,14 @@ gem = model(IpoptSolver())
 
 end
 
-@constraints gem beging
+@constraints gem begin
     C[sec] .== muH[sec] + alphaHLES[sec]/(PD[sec]) * (Y - sum(PD[s] * muH[s] for s in sec)),
 
 end
+
+
+# from david
+#sector = [:sec1, :sec2]
+#@variable m begin
+#  x[sector]
+# end
