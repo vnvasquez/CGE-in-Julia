@@ -76,17 +76,17 @@ end
 ## Production
 @constraints M begin
   # FIRMS
-  EQK, K	== gammaF^sigmaF * PK^(-sigmaF) * (gammaF^sigmaF * PK^(1-sigmaF) +
-        (1-gammaF)^sigmaF * PL^(1-sigmaF))^(sigmaF/(1-sigmaF)) * (XD/aF)                #firm demand for capital
+  EQK, K[sec]	== gammaF[sec]^sigmaF[sec] * PK^(-sigmaF[sec]) * (gammaF[sec]^sigmaF[sec] * PK^(1-sigmaF[sec]) +
+        (1-gammaF[sec])^sigmaF[sec] * PL^(1-sigmaF[sec]))^(sigmaF[sec]/(1-sigmaF[sec])) * (XD[sec]/aF[sec])                #firm demand for capital
 
-  EQL, L == (1-gammaF)^sigmaF * PL^(-sigmaF) * (gammaF^sigmaF * PK^(1-sigmaF) +
-        (1-gammaF)^sigmaF * PL^(1-sigmaF)^(sigmaF/(1-sigmaF)) * (XD/aF)                 #firm demand for labor
+  EQL, L[sec] == (1-gammaF[sec])^sigmaF[sec] * PL^(-sigmaF[sec]) * (gammaF[sec]^sigmaF[sec] * PK^(1-sigmaF[sec]) +
+        (1-gammaF[sec])^sigmaF[sec] * PL^(1-sigmaF[sec])^(sigmaF[sec]/(1-sigmaF[sec])) * (XD[sec]/aF[sec])                 #firm demand for labor
 
-  EQZPC, PD * XD == PK*K + PL*L + sum(io*PD)*XD                                         #zero-profit condition
+  EQZPC, PD[sec] * XD[sec] == PK*K[sec] + PL*L[sec] + sum(io[sec, com]*PD)*XD[sec]                                         #zero-profit condition
 
   # MARKET CLEARING
-  EQKS, sum(K) == KS           #capital market clearing  == sum(K)
-  EQLS, sum(L) == LS           #labor market clearing == sum(L)
+  EQKS, sum(K[sec]) == KS           #capital market clearing  == sum(K)
+  EQLS, sum(L[sec]) == LS           #labor market clearing == sum(L)
 end
 
 ### SOLVER ###
