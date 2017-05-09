@@ -1,6 +1,7 @@
-using Ipopt, JuMP
+using Ipopt, JuMP, DataFrames
 
 M = Model(solver = IpoptSolver(print_level = 0))
+data = readtable("data.csv")
 
 ### PARAMETERS ###
 
@@ -36,10 +37,11 @@ UZ = prod((CZ - muH).^alphaHLES)	       # utility level of household
 
 
 # Variables
-
+sector = [1,2]
 ## Production
 @variables M begin
-  K, (start = KZ)
+  K[i = sector], (start = KZ[i])
+end
   PK, start = PKZ
   L, start = LZ
   PL, start = PLZ
@@ -60,9 +62,9 @@ end
 ### EQUATIONS (constraints) ###
 
 ## Consumption
-@constraints M begin
+@NLconstraints M begin
   # HOUSEHOLDS
-  EQC, C  == muH  + alphaHLES /(PD  * (Y - sum(PD  * muH ))    	 #consumer consumption
+  EQC[i = sector], C[i]  == muH[i]  + alphaHLES[i] /(PD[i]  * (Y[i] - sum(PD[j]  * muH[j] for j in sector ))    	 #consumer consumption
   EQY, Y == PK*KS + PL*LS	                                 #income balance
   EQU, U == prod((C  - muH )^alphaHLES )	                     #household utility
 
@@ -72,7 +74,7 @@ end
 end
 
 ## Production
-@constraints M begin
+@NLconstraints M begin
   # FIRMS
   EQK, K 	== gammaF ^sigmaF  * PK^(-sigmaF ) * (gammaF ^sigmaF  * PK^(1-sigmaF ) +
         (1-gammaF )^sigmaF  * PL^(1-sigmaF ))^(sigmaF /(1-sigmaF )) * (XD /aF )                #firm demand for capital
