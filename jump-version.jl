@@ -41,14 +41,13 @@ sector = [1,2]
 ## Production
 @variables M begin
   K[i = sector], (start = KZ[i])
-end
-  PK, start = PKZ
-  L, start = LZ
-  PL, start = PLZ
-  PD, start = PDZ
-  KS, start = KSZ
-  LS, start = LSZ
-  XD, start = XDZ
+  PK[i = sector], (start = PKZ[i])
+  L[i = sector], (start = LZ[i])
+  PL[i = sector], (start = PLZ[i])
+  PD[i = sector], (start = PDZ[i])
+  KS[i = sector], (start = KSZ[i])
+  LS[i = sector], (start = LSZ[i])
+  XD[i = sector], (start = XDZ[i])
 end
 
 ## Consumption
