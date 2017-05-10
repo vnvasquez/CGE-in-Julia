@@ -75,13 +75,13 @@ end
 ## Production
 @NLconstraints M begin
   # FIRMS
-  EQK, K 	== gammaF ^sigmaF  * PK^(-sigmaF ) * (gammaF ^sigmaF  * PK^(1-sigmaF ) +
-        (1-gammaF )^sigmaF  * PL^(1-sigmaF ))^(sigmaF /(1-sigmaF )) * (XD /aF )                #firm demand for capital
+  EQK[i = sector], K[i] 	== gammaF[i] ^sigmaF[i]  * PK[i]^(-sigmaF[i] ) * (gammaF[i] ^sigmaF[i]  * PK[i]^(1-sigmaF[i]) +
+        (1-gammaF[i] )^sigmaF[i]  * PL[i]^(1-sigmaF[i] ))^(sigmaF[i] /(1-sigmaF[i] )) * (XD[i] /aF[i] )                #firm demand for capital
 
-  EQL, L  == (1-gammaF )^sigmaF  * PL^(-sigmaF ) * (gammaF ^sigmaF  * PK^(1-sigmaF ) +
-        (1-gammaF )^sigmaF  * PL^(1-sigmaF )^(sigmaF /(1-sigmaF )) * (XD /aF )                 #firm demand for labor
+  EQL[i = sector], L[i]  == (1-gammaF[i] )^sigmaF[i]  * PL[i]^(-sigmaF[i] ) * (gammaF[i] ^sigmaF[i]  * PK[i]^(1-sigmaF[i] ) +
+        (1-gammaF[i] )^sigmaF[i]  * PL[i]^(1-sigmaF[i] )^(sigmaF[i] /(1-sigmaF[i] )) * (XD[i] /aF[i] )                 #firm demand for labor
 
-  EQZPC, PD  * XD  == PK*K  + PL*L  + sum(io *PD)*XD                                          #zero-profit condition
+  EQZPC[i = sector], PD[i]  * XD[i]  == PK[i]*K[i]  + PL[i]*L[i]  + sum(io[j] *PD[j] for j in sector)*XD[i]                                          #zero-profit condition
 
   # MARKET CLEARING
   EQKS[i = sector], sum(K[j] for j in sector) == KS[i]           #capital market clearing  == sum(K)
