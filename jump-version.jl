@@ -52,9 +52,9 @@ end
 
 ## Consumption
 @variables M begin
-  C, start = CZ
-  Y, start = YZ
-  U, start = UZ
+  C[i = sector], (start = CZ[i])
+  Y[i = sector], (start = YZ[i])
+  U[i = sector], (start = UZ[i])
 end
 
 
@@ -64,11 +64,11 @@ end
 @NLconstraints M begin
   # HOUSEHOLDS
   EQC[i = sector], C[i]  == muH[i]  + alphaHLES[i] /(PD[i]  * (Y[i] - sum(PD[j]  * muH[j] for j in sector ))    	 #consumer consumption
-  EQY, Y == PK*KS + PL*LS	                                 #income balance
-  EQU, U == prod((C  - muH )^alphaHLES )	                     #household utility
+  EQY[i = sector], Y[i] == PK[i]*KS[i] + PL[i]*LS[i]	                                 #income balance
+  EQU[i = sector], U[i] == prod((C[i]  - muH[i] )^alphaHLES[i])	                     #household utility
 
   # MARKET CLEARING
-  EQXD, XD  == sum(io  * XD) + C	                            #market clearing consumption
+  EQXD[i = sector], XD[i]  == sum(io[j]  * XD[j] for j in sector) + C[i]	                            #market clearing consumption
 
 end
 
@@ -84,8 +84,8 @@ end
   EQZPC, PD  * XD  == PK*K  + PL*L  + sum(io *PD)*XD                                          #zero-profit condition
 
   # MARKET CLEARING
-  EQKS, sum(K ) == KS           #capital market clearing  == sum(K)
-  EQLS, sum(L ) == LS           #labor market clearing == sum(L)
+  EQKS[i = sector], sum(K[j] for j in sector) == KS[i]           #capital market clearing  == sum(K)
+  EQLS[i = sector], sum(L[j] for j in sector) == LS[i]           #labor market clearing == sum(L)
 end
 
 ### SOLVER ###
