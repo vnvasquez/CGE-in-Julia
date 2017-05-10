@@ -74,6 +74,7 @@ end
   EQC[i = sector], C[i]  == muH[i]  + alphaHLES[i] /(PD[i]  * (Y - sum(PD[j]  * muH[j] for j in sector )))    	 #consumer consumption
   EQY, Y == PK*KS + PL*LS	                                 #income balance
   EQU[i = sector], U == prod((C[j]  - muH[j])^alphaHLES[j] for j in sector)	                     #household utility
+  
   # MARKET CLEARING
   EQXD[i = sector, j = com], XD[i]  == sum(io[i,j]  * XD[j] for i in sector for j in com) + C[i]	                            #market clearing consumption
 
@@ -82,17 +83,17 @@ end
 ## Production
 @NLconstraints M begin
   # FIRMS
-  EQK, K 	== gammaF ^sigmaF  * PK^(-sigmaF ) * (gammaF ^sigmaF  * PK^(1-sigmaF ) +
-        (1-gammaF )^sigmaF  * PL^(1-sigmaF ))^(sigmaF /(1-sigmaF )) * (XD /aF )                #firm demand for capital
+  EQK[i = sector], K[i] 	== gammaF[i] ^sigmaF[i]  * PK[i]^(-sigmaF[i] ) * (gammaF[i] ^sigmaF[i]  * PK[i]^(1-sigmaF[i]) +
+        (1-gammaF[i] )^sigmaF[i]  * PL[i]^(1-sigmaF[i] ))^(sigmaF[i] /(1-sigmaF[i] )) * (XD[i] /aF[i] )                #firm demand for capital
 
-  EQL, L  == (1-gammaF )^sigmaF  * PL^(-sigmaF ) * (gammaF ^sigmaF  * PK^(1-sigmaF ) +
-        (1-gammaF )^sigmaF  * PL^(1-sigmaF )^(sigmaF /(1-sigmaF )) * (XD /aF )                 #firm demand for labor
+  EQL[i = sector], L[i]  == (1-gammaF[i] )^sigmaF[i]  * PL[i]^(-sigmaF[i] ) * (gammaF[i] ^sigmaF[i]  * PK[i]^(1-sigmaF[i] ) +
+        (1-gammaF[i] )^sigmaF[i]  * PL[i]^(1-sigmaF[i] )^(sigmaF[i] /(1-sigmaF[i] )) * (XD[i] /aF[i] )                 #firm demand for labor
 
-  EQZPC, PD  * XD  == PK*K  + PL*L  + sum(io *PD)*XD                                          #zero-profit condition
+  EQZPC[i = sector], PD[i]  * XD[i]  == PK[i]*K[i]  + PL[i]*L[i]  + sum(io[j] *PD[j] for j in sector)*XD[i]                                          #zero-profit condition
 
   # MARKET CLEARING
-  EQKS, sum(K ) == KS           #capital market clearing  == sum(K)
-  EQLS, sum(L ) == LS           #labor market clearing == sum(L)
+  EQKS[i = sector], sum(K[j] for j in sector) == KS[i]           #capital market clearing  == sum(K)
+  EQLS[i = sector], sum(L[j] for j in sector) == LS[i]           #labor market clearing == sum(L)
 end
 
 ### SOLVER ###
