@@ -66,37 +66,39 @@ end
 
 ### EQUATIONS (constraints) ###
 
-## Consumption
+## Production Block
+
+@NLconstraints M begin
+
+  # FIRMS
+  EQK[i = sector], K[i] == gammaF[i]^sigmaF[i] * PK^(-sigmaF[i]) * (gammaF[i]^sigmaF[i] * PK^(1-sigmaF[i]) +
+        (1-gammaF[i])^sigmaF[i] * PL^(1-sigmaF[i]))^(sigmaF[i]/(1-sigmaF[i])) * (XD[i]/aF[i])                      # firm demand for capital
+  EQL[i = sector], L[i] == (1-gammaF[i])^sigmaF[i] * PL^(-sigmaF[i]) * (gammaF[i]^sigmaF[i] * PK^(1-sigmaF[i]) + (1-gammaF[i])^sigmaF[i] * PL^(1-sigmaF[i]))^(sigmaF[i]/(1-sigmaF[i])) * (XD[i]/aF[i])
+                                          # firm demand for labor
+  EQZPC[i = sector, j = com], PD[i] * XD[i] == PK*K[i] + PL*L[i] + sum(io[i,j] * PD[j] for i in sector for j in com)*XD[i]                              # zero-profit condition
+
+  # MARKET CLEARING
+  EQKS[i = sector], sum(K[j] for j in sector) == KS           # capital market clearing
+  EQLS[i = sector], sum(L[j] for j in sector) == LS           # labor market clearing
+
+end
+
+## Consumption Block
 
 @NLconstraints M begin
 
   # HOUSEHOLDS
-  EQC[i = sector], C[i]  == muH[i]  + alphaHLES[i] /(PD[i]  * (Y - sum(PD[j]  * muH[j] for j in sector )))    	 #consumer consumption
-  EQY, Y == PK*KS + PL*LS	                                 #income balance
-  EQU[i = sector], U == prod((C[j]  - muH[j])^alphaHLES[j] for j in sector)	                     #household utility
-  
+  EQC[i = sector], C[i]  == muH[i]  + alphaHLES[i] /(PD[i]  * (Y - sum(PD[j]  * muH[j] for j in sector )))
+                                                                              # consumer consumption
+  EQY, Y == PK*KS + PL*LS	                                                    # income balance
+  EQU[i = sector], U == prod((C[j]  - muH[j])^alphaHLES[j] for j in sector)	  # household utility
+
   # MARKET CLEARING
-  EQXD[i = sector, j = com], XD[i]  == sum(io[i,j]  * XD[j] for i in sector for j in com) + C[i]	                            #market clearing consumption
+  EQXD[i = sector, j = com], XD[i]  == sum(io[i,j]  * XD[j] for i in sector for j in com) + C[i]	                                                                      # market clearing consumption
 
 end
 
-## Production
-@NLconstraints M begin
-  # FIRMS
-  EQK[i = sector], K[i] 	== gammaF[i] ^sigmaF[i]  * PK[i]^(-sigmaF[i] ) * (gammaF[i] ^sigmaF[i]  * PK[i]^(1-sigmaF[i]) +
-        (1-gammaF[i] )^sigmaF[i]  * PL[i]^(1-sigmaF[i] ))^(sigmaF[i] /(1-sigmaF[i] )) * (XD[i] /aF[i] )                #firm demand for capital
-
-  EQL[i = sector], L[i]  == (1-gammaF[i] )^sigmaF[i]  * PL[i]^(-sigmaF[i] ) * (gammaF[i] ^sigmaF[i]  * PK[i]^(1-sigmaF[i] ) +
-        (1-gammaF[i] )^sigmaF[i]  * PL[i]^(1-sigmaF[i] )^(sigmaF[i] /(1-sigmaF[i] )) * (XD[i] /aF[i] )                 #firm demand for labor
-
-  EQZPC[i = sector], PD[i]  * XD[i]  == PK[i]*K[i]  + PL[i]*L[i]  + sum(io[j] *PD[j] for j in sector)*XD[i]                                          #zero-profit condition
-
-  # MARKET CLEARING
-  EQKS[i = sector], sum(K[j] for j in sector) == KS[i]           #capital market clearing  == sum(K)
-  EQLS[i = sector], sum(L[j] for j in sector) == LS[i]           #labor market clearing == sum(L)
-end
 
 ### SOLVER ###
 
-#TRICK == 0  #objective function -> unnecessary because using solver
 solve(M)
