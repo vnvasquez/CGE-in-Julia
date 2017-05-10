@@ -40,6 +40,7 @@ UZ = prod((CZ - muH).^alphaHLES)	      # utility level of household
 ### VARIABLES ###
 
 sector = [1,2]
+com = [1,2]
 
 ## Production block
 
@@ -66,14 +67,15 @@ end
 ### EQUATIONS (constraints) ###
 
 ## Consumption
-@NLconstraints M begin
-  # HOUSEHOLDS
-  EQC[i = sector], C[i]  == muH[i]  + alphaHLES[i] /(PD[i]  * (Y[i] - sum(PD[j]  * muH[j] for j in sector ))    	 #consumer consumption
-  EQY, Y == PK*KS + PL*LS	                                 #income balance
-  EQU, U == prod((C  - muH )^alphaHLES )	                     #household utility
 
+@NLconstraints M begin
+
+  # HOUSEHOLDS
+  EQC[i = sector], C[i]  == muH[i]  + alphaHLES[i] /(PD[i]  * (Y - sum(PD[j]  * muH[j] for j in sector )))    	 #consumer consumption
+  EQY, Y == PK*KS + PL*LS	                                 #income balance
+  EQU[i = sector], U == prod((C[j]  - muH[j])^alphaHLES[j] for j in sector)	                     #household utility
   # MARKET CLEARING
-  EQXD, XD  == sum(io  * XD) + C	                            #market clearing consumption
+  EQXD[i = sector, j = com], XD[i]  == sum(io[i,j]  * XD[j] for i in sector for j in com) + C[i]	                            #market clearing consumption
 
 end
 
