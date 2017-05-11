@@ -10,12 +10,12 @@ sec = [:sec1, :sec2]
 ## Production block
 
 KZ[sec] = [60.,50.]              # inital capital demand
-KSZ = sum(KZ)               # capital endowment
+KSZ = sum(KZ)                    # capital endowment
 LZ[sec] = [20.,90.]              # initial labor demand
 LSZ = sum(LZ)               # labor endowment
 PKZ = 1.                    # initial capital price
 PLZ = 1.                    # initial labor price (wages)
-PDZ[sec] = [1.,1.]               # inital commodity price (price of domestically-produced commodities)
+PDZ[sec] = [1.,1.]                    # inital commodity price (price of domestically-produced commodities)
 IOZ[sec,com] = [5. 40. ; 15. 20.]    # intermediate inputs
 io = IOZ/XDZ               # Technical coefficients
 XDZ = (PKZ.*KZ)./PDZ + (PLZ.*LZ)./PDZ + (IOZ[1:2]*PDZ + IOZ[3:4]*PDZ)./PDZ
