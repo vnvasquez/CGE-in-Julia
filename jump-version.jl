@@ -1,6 +1,6 @@
 using Ipopt, JuMP, DataFrames
 
-M = Model(solver = IpoptSolver(print_level = 0))
+M = Model(solver = IpoptSolver())
 
 data = readtable("data.csv")
 
@@ -75,11 +75,11 @@ end
         (1-gammaF[i])^sigmaF[i] * PL^(1-sigmaF[i]))^(sigmaF[i]/(1-sigmaF[i])) * (XD[i]/aF[i])                      # firm demand for capital
   EQL[i = sector], L[i] == (1-gammaF[i])^sigmaF[i] * PL^(-sigmaF[i]) * (gammaF[i]^sigmaF[i] * PK^(1-sigmaF[i]) + (1-gammaF[i])^sigmaF[i] * PL^(1-sigmaF[i]))^(sigmaF[i]/(1-sigmaF[i])) * (XD[i]/aF[i])
                                           # firm demand for labor
-  EQZPC[i = sector, j = com], PD[i] * XD[i] == PK*K[i] + PL*L[i] + sum(io[i,j] * PD[j] for i in sector for j in com)*XD[i]                              # zero-profit condition
+  EQZPC[i = sector], PD[i] * XD[i] == PK*K[i] + PL*L[i] + sum(io[l,j] * PD[j] for l in sector, j in com)*XD[i]                              # zero-profit condition
 
   # MARKET CLEARING
-  EQKS[i = sector], sum(K[j] for j in sector) == KS           # capital market clearing
-  EQLS[i = sector], sum(L[j] for j in sector) == LS           # labor market clearing
+  EQKS, sum(K[j] for j in sector) == KS           # capital market clearing
+  EQLS, sum(L[j] for j in sector) == LS           # labor market clearing
 
 end
 
@@ -91,14 +91,15 @@ end
   EQC[i = sector], C[i]  == muH[i]  + alphaHLES[i] /(PD[i]  * (Y - sum(PD[j]  * muH[j] for j in sector )))
                                                                               # consumer consumption
   EQY, Y == PK*KS + PL*LS	                                                    # income balance
-  EQU[i = sector], U == prod((C[j]  - muH[j])^alphaHLES[j] for j in sector)	  # household utility
+  EQU, U == prod((C[j]  - muH[j])^alphaHLES[j] for j in sector)	  # household utility
 
   # MARKET CLEARING
-  EQXD[i = sector, j = com], XD[i]  == sum(io[i,j]  * XD[j] for i in sector for j in com) + C[i]	                                                                      # market clearing consumption
+  EQXD[i = sector], XD[i]  == sum(io[l,j]  * XD[j] for l in sector, j in com) + C[i]	                                                                      # market clearing consumption
 
 end
 
 
 ### SOLVER ###
 
+@NLobjective(M, Max, 0)
 solve(M)
