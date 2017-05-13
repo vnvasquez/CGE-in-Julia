@@ -3,6 +3,7 @@ using Ipopt, JuMP, DataFrames
 M = Model(solver = IpoptSolver())
 
 data = readtable("data.csv")
+IOdata = readtable("IOdata.csv")
 
 ### PARAMETERS ###
 
@@ -15,7 +16,7 @@ LSZ = sum(LZ)               # labor endowment
 PKZ = 1.                    # initial capital price
 PLZ = 1.                    # initial labor price (wages)
 PDZ  = data[:PDZ]           # inital commodity price (price of domestically-produced commodities)
-IOZ = [5. 40. ; 15. 20.]    # intermediate inputs
+IOZ = [IOdata[:com1] IOdata[:com2]]'   # intermediate inputs
 XDZ = (PKZ.*KZ)./PDZ + (PLZ.*LZ)./PDZ + [sum(IOZ[:,1]),sum(IOZ[:,2])].*PDZ
                             # initial commodity production level
 io = IOZ./XDZ'           # Technical coefficients
@@ -48,10 +49,10 @@ com = [1,2]
   K[i = sector], (start = KZ[i])
   PK, (start = PKZ)
   L[i = sector], (start = LZ[i])
-  PL, (start = PLZ)
+  PL == PLZ                         # numeraire
   PD[i = sector], (start = PDZ[i])
-  KS, (start = KSZ)
-  LS, (start = LSZ)
+  KS == KSZ                         # fixed capital supply
+  LS == LSZ                         # fixed labor supply
   XD[i = sector], (start = XDZ[i])
 end
 
@@ -100,4 +101,4 @@ end
 ### SOLVER ###
 
 @NLobjective(M, Max, 0)
-solve(M)
+@time solve(M)
